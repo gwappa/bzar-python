@@ -31,7 +31,7 @@ import numpy as _np
 
 from . import codec
 
-VERSION_STR = "1.0.1"
+VERSION_STR = "1.0.2"
 
 try:
     from os import PathLike as _PathLike
@@ -81,7 +81,7 @@ def check_suffix(fileref):
             fileref = fileref.with_suffix('.bzar')
     return fileref
 
-def save(fileref, data=None, metadata=None, order='C'):
+def save(fileref, data=None, metadata=None, compression_level=None, order='C'):
     """saves the data/metadata to a file represented by `fileref`."""
     if isinstance(fileref, (str, bytes, _PathLike)):
         fileref = check_suffix(fileref)
@@ -95,7 +95,7 @@ def save(fileref, data=None, metadata=None, order='C'):
     metadict = generate_metadata_dict(data=data, metadata=metadata, arrayorder=order)
     metabin  = codec.encode_metadata_dict(metadict)
     metasiz  = calc_metadata_size(metabin)
-    databin  = data.tobytes(order=order)
+    databin  = codec.encode_data(data, order, compression_level=compression_level)
     fileref.write(databin)
     fileref.write(metabin)
     fileref.write(codec.encode_metadata_size(metasiz))
@@ -176,7 +176,7 @@ def load(fileref, with_metadata=False, complete_metadata=False, metadata_dict=No
     data_raw = _read_exact(fileref, datasize)
     if data_raw is None:
         raise codec.BzarDecodeError("failed to read the binary data")
-    data = _np.frombuffer(data_raw, dtype=dtype)
+    data = _np.frombuffer(codec.decode_data(data_raw), dtype=dtype)
     if reshape == True:
         data = data.reshape(metadata_dict['shape'])
 

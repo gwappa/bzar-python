@@ -38,12 +38,13 @@ class TestBzarIO(unittest.TestCase):
         self.metadata_base = { "description": "test case for bzar I/O" }
         self.metadata_orig = bzar.generate_metadata_dict(data=self.data_orig, metadata=self.metadata_base)
         self.metadata_size = bzar.calc_metadata_size(self.metadata_orig)
-        bzar.save(self.FILENAME_BASE, data=self.data_orig, metadata=self.metadata_base)
+        self.data_size     = len(bzar.codec.encode_data(self.data_orig, order='C'))
+        bzar.save(self.FILENAME_BASE, data=self.data_orig, metadata=self.metadata_base, order='C')
 
     def test_read_data_sizes(self):
         datasiz, metasiz = bzar.read_data_sizes(self.FILENAME_FULL)
         self.assertEqual(self.metadata_size, metasiz)
-        self.assertEqual(len(self.data_orig.tobytes()), datasiz)
+        self.assertEqual(self.data_size, datasiz)
 
     def test_read_metadata(self):
         metadata = bzar.read_metadata(self.FILENAME_FULL, complete=False)

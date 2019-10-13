@@ -28,12 +28,14 @@ import sys as _sys
 import json as _json
 import struct as _struct
 import warnings as _warnings
+import zlib as _zlib
 
 import numpy as _np
 
-SizeEncoder         = _struct.Struct('Q')
-METADATA_SIZE_WIDTH = 8
-DATA_INFO_KEYS      = ('datatype', 'byteorder')
+SizeEncoder               = _struct.Struct('Q')
+METADATA_SIZE_WIDTH       = 8
+DATA_INFO_KEYS            = ('datatype', 'byteorder')
+DEFAULT_COMPRESSION_LEVEL = 6
 
 DtypeDecoder        = {
     'byte':    (_np.ubyte,   False),
@@ -167,3 +169,12 @@ def encode_metadata_size(metasiz):
 def decode_metadata_size(binarray):
     """used internally to decode the size of the metadata dictionary."""
     return SizeEncoder.unpack(binarray)[0]
+
+def encode_data(data, order='C', compression_level=None):
+    """encode a numpy.ndarray object."""
+    if compression_level is None:
+        compression_level = DEFAULT_COMPRESSION_LEVEL
+    return _zlib.compress(data.tobytes(order=order), compression_level)
+
+def decode_data(rawdata):
+    return _zlib.decompress(rawdata)
