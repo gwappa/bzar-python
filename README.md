@@ -2,6 +2,14 @@
 
 A python implementation for [the bzar format](https://github.com/gwappa/bzar).
 
+## Installation
+
+```
+pip install bzar
+```
+
+Alternatively, you can also clone this repository and perform `pip install .` inside.
+
 ## Basic usage
 
 ```
