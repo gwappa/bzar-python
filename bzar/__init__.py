@@ -31,7 +31,7 @@ import numpy as _np
 
 from . import codec
 
-VERSION_STR = "1.0.0"
+VERSION_STR = "1.0.1"
 
 try:
     from os import PathLike as _PathLike

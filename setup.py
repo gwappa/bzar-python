@@ -29,6 +29,10 @@ setuptools.setup(
     name='bzar',
     version=VERSION_STR,
     description='A python implementation for the bzar, a platform-independent format for numeric arrays',
+    long_description="""
+        `bzar` is a python implementation for the [bzar](https://github.com/gwappa/bzar) format for storing numeric arrays.
+    """,
+    long_description_content_type='text/markdown',
     url='https://github.com/gwappa/bzar-python',
     author='Keisuke Sehara',
     author_email='keisuke.sehara@gmail.com',
