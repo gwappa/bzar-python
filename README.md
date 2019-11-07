@@ -2,6 +2,8 @@
 
 A python implementation for [the bzar format](https://github.com/gwappa/bzar).
 
+![DOI:10.5281/zenodo.3531852](https://zenodo.org/badge/doi/10.5281/zenodo.3531852.svg)
+
 ## Installation
 
 ```

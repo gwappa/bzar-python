@@ -72,9 +72,8 @@ def encode_byteorder(dtype):
     else:
         raise ValueError(f"unknown endian-ness: {order}")
 
-def encode_data_info(data):
-    """returns information about the data array as a dict."""
-    dtype = data.dtype
+def encode_dtype(dtype):
+    """returns information about the data type as a dict."""
     datatype = None
 
     if dtype.char == 'c':
@@ -178,3 +177,68 @@ def encode_data(data, order='C', compression_level=None):
 
 def decode_data(rawdata):
     return _zlib.decompress(rawdata)
+
+class Encoder:
+    """a binary stream encoder into a bzar archive."""
+
+    def __init__(self, fileref, compression_level=None):
+        """opens an encoder. it assumes that `fileref` is an opened binary writer,
+        at the start of the stream."""
+        self.__ref = fileref
+        if compression_level is None:
+            compression_level = DEFAULT_COMPRESSION_LEVEL
+        self.__lib   = _zlib.compressobj(level=compression_level)
+        self.__nwritten = 0
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, *exc):
+        self.flush()
+
+    def encode(self, bindata, order='C'):
+        self.__nwritten += self.__ref.write(self.__lib.compress(bindata))
+        return len(bindata)
+
+    def flush(self):
+        if self.__lib is not None:
+            self.__nwritten += self.__ref.write(self.__lib.flush())
+            self.__lib = None
+        return self.__nwritten
+
+    def __getattr__(self, name):
+        if name == 'bytes':
+            return self.__nwritten
+
+class Decoder:
+    """a binary stream decoder from a bzar archive."""
+
+    def __init__(self, fileref):
+        """opens an decoder. it assumes that `fileref` is an opened binary reader,
+        at the start of the stream."""
+        self.__ref = fileref
+        self.__lib = _zlib.decompressobj(memLevel=9)
+        self.__buf = b''
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, *exc):
+        self.close()
+
+    def decode(self, size=1):
+        """reads some bytes (specified with `size`) from the archive.
+        note that, without any necessary cares, it can overrun into the metadata section."""
+        while len(self.__buf) < size:
+            self.__buf += self.__lib.decompress(self.__ref.read(1))
+        buf, self.__buf = self.__buf[:size], self.__buf[size:]
+        return buf
+
+    def close(self, close_file=True):
+        """closes the internal decompressor AND the internal file reference, in case close_file is True."""
+        if self.__ref is not None:
+            self.__lib.flush()
+            if close_file == True:
+                self.__ref.close()
+            self.__ref = None
+            self.__lib = None

@@ -1,4 +1,4 @@
-_test_out.bzar
+_test_out*.bzar
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
