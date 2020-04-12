@@ -38,18 +38,20 @@ DATA_INFO_KEYS            = ('datatype', 'byteorder')
 DEFAULT_COMPRESSION_LEVEL = 6
 
 DtypeDecoder        = {
-    'byte':    (_np.ubyte,   False),
-    'bool8':   (_np.bool,    False),
-    'int8':    (_np.int8,    False),
-    'uint8':   (_np.uint8,   False),
-    'int16':   (_np.int16,   True),
-    'uint16':  (_np.uint16,  True),
-    'int32':   (_np.int32,   True),
-    'uint32':  (_np.uint32,  True),
-    'int64':   (_np.int64,   True),
-    'uint64':  (_np.uint64,  True),
-    'float32': (_np.float32, False),
-    'float64': (_np.float64, False)
+    'byte':       (_np.ubyte,   False),
+    'bool8':      (_np.bool,    False),
+    'int8':       (_np.int8,    False),
+    'uint8':      (_np.uint8,   False),
+    'int16':      (_np.int16,   True),
+    'uint16':     (_np.uint16,  True),
+    'int32':      (_np.int32,   True),
+    'uint32':     (_np.uint32,  True),
+    'int64':      (_np.int64,   True),
+    'uint64':     (_np.uint64,  True),
+    'float32':    (_np.float32, False),
+    'float64':    (_np.float64, False),
+    'complex64':  (_np.complex64, False),
+    'complex128': (_np.complex128, False),
 }
 ByteOrderDecoder    = {
     'little': '<',
@@ -122,6 +124,14 @@ def encode_dtype(dtype):
 
     elif dtype.char == 'd':
         datatype  = 'float64'
+        order     = 'NA'
+
+    elif dtype.char == 'F':
+        datatype  = 'complex64'
+        order     = 'NA'
+
+    elif dtype.char == 'D':
+        datatype  = 'complex128'
         order     = 'NA'
 
     if datatype is None:
